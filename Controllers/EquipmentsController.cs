@@ -1,6 +1,5 @@
 using Equipment.Api.DTOs;
 using Equipment.Api.Services;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using EquipmentModel = Equipment.Api.Models.Equipment;

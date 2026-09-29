@@ -4,3 +4,4 @@ obj/
 *.suo
 .vs/
 build.log
+appsettings.Development.json
