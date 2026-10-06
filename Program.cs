@@ -95,6 +95,20 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
+await using (var scope = app.Services.CreateAsyncScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var passwordHasher = scope.ServiceProvider.GetRequiredService<PasswordHasher<User>>();
+
+    await dbContext.Database.MigrateAsync();
+
+    await DbSeeder.SeedAsync(
+        dbContext,
+        passwordHasher,
+        builder.Configuration
+    );
+}
+
 app.UseSwagger();
 app.UseSwaggerUI();
 
