@@ -11,6 +11,7 @@ public static class ErrorCodes
     public const string Unauthorized = "UNAUTHORIZED";
     public const string Forbidden = "FORBIDDEN";
     public const string ResourceNotFound = "RESOURCE_NOT_FOUND";
+    public const string EquipmentNotFound = "EQUIPMENT_NOT_FOUND";
     public const string UsernameAlreadyExists = "USERNAME_ALREADY_EXISTS";
     public const string InvalidRefreshToken = "INVALID_REFRESH_TOKEN";
     public const string UnexpectedError = "UNEXPECTED_ERROR";
