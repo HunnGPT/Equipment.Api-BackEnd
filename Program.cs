@@ -1,12 +1,14 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
-using Equipment.Api.Services;
-using Equipment.Api.Models;
-using Equipment.Api.Data;
 using System.Text;
+using Equipment.Api.Data;
+using Equipment.Api.Models;
+using Equipment.Api.Services;
+using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Mvc;
+using Equipment.Api.DTOs.Errors;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +25,41 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddControllers();
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errors = context.ModelState
+            .Where(x => x.Value?.Errors.Count > 0)
+            .ToDictionary(
+                x => ToCamelCase(x.Key),
+                x => x.Value!.Errors
+                    .Select(e => string.IsNullOrWhiteSpace(e.ErrorMessage)
+                        ? "Giá trị không hợp lệ"
+                        : e.ErrorMessage)
+                    .ToArray()
+            );
+
+        var response = ErrorResponseFactory.CreateValidation(
+            context.HttpContext,
+            errors
+        );
+
+        return new BadRequestObjectResult(response);
+    };
+});
+
+static string ToCamelCase(string value)
+{
+    if (string.IsNullOrEmpty(value) || char.IsLower(value[0]))
+    {
+        return value;
+    }
+
+    return char.ToLowerInvariant(value[0]) + value[1..];
+}
+
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(options =>
@@ -80,6 +117,36 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             {
                 context.Token = context.Request.Cookies["accessToken"];
                 return Task.CompletedTask;
+            },
+
+            OnChallenge = async context =>
+            {
+                context.HandleResponse();
+
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                context.Response.ContentType = "application/json";
+
+                var response = ErrorResponseFactory.Create(
+                    context.HttpContext,
+                    ErrorCodes.Unauthorized,
+                    "Bạn chưa đăng nhập hoặc phiên đăng nhập không hợp lệ"
+                );
+
+                await context.Response.WriteAsJsonAsync(response);
+            },
+
+            OnForbidden = async context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                context.Response.ContentType = "application/json";
+
+                var response = ErrorResponseFactory.Create(
+                    context.HttpContext,
+                    ErrorCodes.Forbidden,
+                    "Bạn không có quyền thực hiện thao tác này"
+                );
+
+                await context.Response.WriteAsJsonAsync(response);
             }
         };
     });
@@ -124,3 +191,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }

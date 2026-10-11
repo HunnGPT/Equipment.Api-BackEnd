@@ -1,6 +1,7 @@
 using Equipment.Api.DTOs;
 using Equipment.Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using Equipment.Api.DTOs.Errors;
 using Microsoft.AspNetCore.Authorization;
 using EquipmentModel = Equipment.Api.Models.Equipment;
 
@@ -29,7 +30,13 @@ public class EquipmentsController : ControllerBase
     public async Task<IActionResult> GetById(int id)
     {
         var equipment = await _equipmentService.GetByIdAsync(id);
-        if (equipment == null) return NotFound();
+        if (equipment == null) return NotFound(
+            ErrorResponseFactory.Create(
+                HttpContext,
+                ErrorCodes.EquipmentNotFound,
+                "Không tìm thấy thiết bị"
+            )
+        );
         return Ok(equipment);
     }
 

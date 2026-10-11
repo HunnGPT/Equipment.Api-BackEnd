@@ -1,6 +1,7 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
+using Equipment.Api.DTOs.Errors;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -28,9 +29,15 @@ public class AuthController : ControllerBase
 
             return Ok(response);
         }
-        catch (UsernameAlreadyExistsException ex)
+        catch (UsernameAlreadyExistsException)
         {
-            return Conflict(ex.Message);
+            return Conflict(
+                ErrorResponseFactory.Create(
+                    HttpContext,
+                    ErrorCodes.UsernameAlreadyExists,
+                    "Tên tài khoản đã tồn tại"
+                )
+            );
         }
     }
 
@@ -41,7 +48,13 @@ public class AuthController : ControllerBase
 
         if (response == null)
         {
-            return Unauthorized("Sai tên tài khoản hoặc mật khẩu");
+            return Unauthorized(
+                ErrorResponseFactory.Create(
+                    HttpContext,
+                    ErrorCodes.InvalidCredentials,
+                    "Tên đăng nhập hoặc mật khẩu không đúng"
+                )
+            );
         }
 
         Response.Cookies.Append("accessToken", response.Token, new CookieOptions
@@ -74,14 +87,26 @@ public class AuthController : ControllerBase
 
         if (string.IsNullOrEmpty(refreshToken))
         {
-            return Unauthorized("Không tìm thấy token");
+            return Unauthorized(
+                ErrorResponseFactory.Create(
+                    HttpContext,
+                    ErrorCodes.InvalidRefreshToken,
+                    "Refresh token không hợp lệ"
+                )
+            );
         }
 
         var response = await _authService.RefreshTokenAsync(refreshToken);
 
         if (response == null)
         {
-            return Unauthorized("Refresh token không hợp lệ hoặc đã hết hạn");
+            return Unauthorized(
+                ErrorResponseFactory.Create(
+                    HttpContext,
+                    ErrorCodes.InvalidRefreshToken,
+                    "Refresh token không hợp lệ hoặc đã hết hạn"
+                )
+            );
         }
 
         Response.Cookies.Append("accessToken", response.Token, new CookieOptions
