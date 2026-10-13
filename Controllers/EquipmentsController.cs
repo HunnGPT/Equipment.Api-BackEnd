@@ -1,9 +1,12 @@
+using MediatR;
 using Equipment.Api.DTOs;
-using Equipment.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Equipment.Api.DTOs.Errors;
+using Equipment.Api.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using EquipmentModel = Equipment.Api.Models.Equipment;
+using Equipment.Api.Application.Equipment.Queries;
+using Equipment.Api.Application.Equipment.Commands;
+using EquipmentModel = Equipment.Api.Domain.Entities.Equipment;
 
 namespace Equipment.Api.Controllers;
 
@@ -12,9 +15,13 @@ namespace Equipment.Api.Controllers;
 public class EquipmentsController : ControllerBase
 {
     private readonly IEquipmentService _equipmentService;
-    public EquipmentsController(IEquipmentService equipmentService)
+    private readonly ISender _sender;
+    public EquipmentsController(
+    IEquipmentService equipmentService,
+    ISender sender)
     {
         _equipmentService = equipmentService;
+        _sender = sender;
     }
 
     [Authorize]
@@ -29,7 +36,8 @@ public class EquipmentsController : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var equipment = await _equipmentService.GetByIdAsync(id);
+        var equipment = await _sender.Send(new GetEquipmentByIdQuery(id));
+
         if (equipment == null) return NotFound(
             ErrorResponseFactory.Create(
                 HttpContext,
@@ -44,13 +52,12 @@ public class EquipmentsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreateEquipmentRequest request)
     {
-        var equipment = new EquipmentModel
-        {
-            Code = request.Code,
-            Name = request.Name,
-            Status = request.Status
-        };
-        var data = await _equipmentService.CreateAsync(equipment);
+        var data = await _sender.Send(
+        new CreateEquipmentCommand(
+            request.Code,
+            request.Name,
+            request.Status)
+        );
         return CreatedAtAction(nameof(GetById), new { id = data.Id }, data);
     }
 

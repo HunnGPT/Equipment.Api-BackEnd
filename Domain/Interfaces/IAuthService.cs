@@ -1,4 +1,6 @@
-using Equipment.Api.Models;
+using Equipment.Api.Domain.Entities;
+
+namespace Equipment.Api.Domain.Interfaces;
 
 public interface IAuthService
 {

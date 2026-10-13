@@ -1,12 +1,15 @@
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
-using System.Security.Claims;
-using Equipment.Api.Models;
-using Equipment.Api.Data;
 using System.Text;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Equipment.Api.Domain.Entities;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using Equipment.Api.Domain.Interfaces;
+using Equipment.Api.Infrastructure.Data;
+
+namespace Equipment.Api.Services;
 
 public class AuthService : IAuthService
 {
@@ -31,7 +34,7 @@ public class AuthService : IAuthService
         };
 
         var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(_configuration["JWT:Key"]!)
+            Encoding.UTF8.GetBytes(_configuration["JwT:Key"]!)
         );
 
         var credentials = new SigningCredentials(

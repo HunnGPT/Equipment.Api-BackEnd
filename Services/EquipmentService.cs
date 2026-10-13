@@ -1,7 +1,8 @@
-using Equipment.Api.Data;
 using Equipment.Api.DTOs;
 using Microsoft.EntityFrameworkCore;
-using EquipmentModel = Equipment.Api.Models.Equipment;
+using Equipment.Api.Domain.Interfaces;
+using Equipment.Api.Infrastructure.Data;
+using EquipmentModel = Equipment.Api.Domain.Entities.Equipment;
 
 namespace Equipment.Api.Services;
 

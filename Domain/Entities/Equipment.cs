@@ -1,4 +1,4 @@
-namespace Equipment.Api.Models;
+namespace Equipment.Api.Domain.Entities;
 
 public class Equipment
 {

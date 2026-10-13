@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using Equipment.Api.Models;
-using EquipmentModel = Equipment.Api.Models.Equipment;
+using Equipment.Api.Domain.Entities;
+using EquipmentModel = Equipment.Api.Domain.Entities.Equipment;
 
-namespace Equipment.Api.Data;
+namespace Equipment.Api.Infrastructure.Data;
 
 public class AppDbContext : DbContext
 {

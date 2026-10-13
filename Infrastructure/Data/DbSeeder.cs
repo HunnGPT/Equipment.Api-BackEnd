@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Equipment.Api.Models;
+using Equipment.Api.Domain.Entities;
 
-namespace Equipment.Api.Data;
+namespace Equipment.Api.Infrastructure.Data;
 
 public static class DbSeeder
 {

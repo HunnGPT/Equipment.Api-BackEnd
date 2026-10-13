@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Equipment.Api.DTOs.Errors;
+using Equipment.Api.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 
 [ApiController]

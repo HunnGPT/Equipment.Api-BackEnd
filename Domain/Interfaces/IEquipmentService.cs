@@ -1,7 +1,7 @@
 using Equipment.Api.DTOs;
-using EquipmentModel = Equipment.Api.Models.Equipment;
+using EquipmentModel = Equipment.Api.Domain.Entities.Equipment;
 
-namespace Equipment.Api.Services;
+namespace Equipment.Api.Domain.Interfaces;
 
 public interface IEquipmentService
 {

@@ -1,6 +1,7 @@
 using System.Text;
-using Equipment.Api.Data;
-using Equipment.Api.Models;
+using Equipment.Api.Domain.Entities;
+using Equipment.Api.Domain.Interfaces;
+using Equipment.Api.Infrastructure.Data;
 using Equipment.Api.Services;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -158,7 +159,12 @@ builder.Services.AddScoped<PasswordHasher<User>>();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection")
-    ));
+    )
+);
+
+builder.Services.AddMediatR(configuration =>
+    configuration.RegisterServicesFromAssembly(typeof(Program).Assembly)
+);
 
 var app = builder.Build();
 
