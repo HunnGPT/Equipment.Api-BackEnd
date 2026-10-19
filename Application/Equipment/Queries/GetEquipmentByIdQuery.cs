@@ -1,6 +1,6 @@
 using MediatR;
-using EquipmentModel = Equipment.Api.Domain.Entities.Equipment;
+using Equipment.Api.DTOs;
 
 namespace Equipment.Api.Application.Equipment.Queries;
 
-public record GetEquipmentByIdQuery(int Id) : IRequest<EquipmentModel?>;
+public record GetEquipmentByIdQuery(int Id) : IRequest<EquipmentDto?>;

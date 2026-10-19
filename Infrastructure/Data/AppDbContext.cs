@@ -13,4 +13,5 @@ public class AppDbContext : DbContext
     public DbSet<EquipmentModel> Equipments => Set<EquipmentModel>();
     public DbSet<User> Users => Set<User>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<Category> Categories => Set<Category>();
 }

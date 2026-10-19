@@ -22,13 +22,36 @@ namespace Equipment.Api.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Equipment.Api.Models.Equipment", b =>
+            modelBuilder.Entity("Equipment.Api.Domain.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("Equipment.Api.Domain.Entities.Equipment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -44,10 +67,12 @@ namespace Equipment.Api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CategoryId");
+
                     b.ToTable("Equipments");
                 });
 
-            modelBuilder.Entity("Equipment.Api.Models.RefreshToken", b =>
+            modelBuilder.Entity("Equipment.Api.Domain.Entities.RefreshToken", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -75,7 +100,7 @@ namespace Equipment.Api.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
-            modelBuilder.Entity("Equipment.Api.Models.User", b =>
+            modelBuilder.Entity("Equipment.Api.Domain.Entities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -100,15 +125,31 @@ namespace Equipment.Api.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Equipment.Api.Models.RefreshToken", b =>
+            modelBuilder.Entity("Equipment.Api.Domain.Entities.Equipment", b =>
                 {
-                    b.HasOne("Equipment.Api.Models.User", "User")
+                    b.HasOne("Equipment.Api.Domain.Entities.Category", "Category")
+                        .WithMany("Equipments")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("Equipment.Api.Domain.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("Equipment.Api.Domain.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Equipment.Api.Domain.Entities.Category", b =>
+                {
+                    b.Navigation("Equipments");
                 });
 #pragma warning restore 612, 618
         }

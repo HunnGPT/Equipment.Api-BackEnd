@@ -6,5 +6,6 @@ namespace Equipment.Api.Application.Equipment.Commands;
 public record CreateEquipmentCommand(
     string Code,
     string Name,
-    string Status
+    string Status,
+    int CategoryId
 ) : IRequest<EquipmentModel>;

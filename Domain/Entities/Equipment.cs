@@ -6,4 +6,7 @@ public class Equipment
     public string Code { get; set; } = "";
     public string Name { get; set; } = "";
     public string Status { get; set; } = "";
+
+    public int CategoryId { get; set; }
+    public Category Category { get; set; } = null!;
 }

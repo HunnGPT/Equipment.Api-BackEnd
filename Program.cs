@@ -1,8 +1,6 @@
 using System.Text;
 using Equipment.Api.Domain.Entities;
-using Equipment.Api.Domain.Interfaces;
 using Equipment.Api.Infrastructure.Data;
-using Equipment.Api.Services;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Equipment.Api.DTOs.Errors;
@@ -152,8 +150,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddScoped<IEquipmentService, EquipmentService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<PasswordHasher<User>>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>

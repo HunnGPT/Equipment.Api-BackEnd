@@ -1,18 +1,20 @@
+using MediatR;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Equipment.Api.DTOs.Errors;
-using Equipment.Api.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Equipment.Api.Application.Auth.Commands;
+using Equipment.Api.Application.Auth.Exceptions;
 
 [ApiController]
 [Route("api/[controller]")]
 
 public class AuthController : ControllerBase
 {
-    private readonly IAuthService _authService;
-    public AuthController(IAuthService authService)
+    private readonly ISender _sender;
+    public AuthController(ISender sender)
     {
-        _authService = authService;
+        _sender = sender;
     }
 
     [HttpPost("register")]
@@ -20,7 +22,9 @@ public class AuthController : ControllerBase
     {
         try
         {
-            var user = await _authService.RegisterAsync(request);
+            var user = await _sender.Send(
+                new RegisterCommand(request.Username, request.Password)
+            );
 
             var response = new AuthResponse
             {
@@ -45,7 +49,9 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginRequest request)
     {
-        var response = await _authService.LoginAsync(request);
+        var response = await _sender.Send(
+            new LoginCommand(request.Username, request.Password)
+        );
 
         if (response == null)
         {
@@ -97,7 +103,9 @@ public class AuthController : ControllerBase
             );
         }
 
-        var response = await _authService.RefreshTokenAsync(refreshToken);
+        var response = await _sender.Send(
+            new RefreshTokenCommand(refreshToken)
+        );
 
         if (response == null)
         {
@@ -131,7 +139,9 @@ public class AuthController : ControllerBase
             return Unauthorized("Refresh token không tồn tại");
         }
 
-        var response = await _authService.LogoutAsync(refreshToken);
+        var response = await _sender.Send(
+            new LogoutCommand(refreshToken)
+        );
 
         if (!response)
         {

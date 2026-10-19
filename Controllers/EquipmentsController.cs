@@ -2,11 +2,9 @@ using MediatR;
 using Equipment.Api.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Equipment.Api.DTOs.Errors;
-using Equipment.Api.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Equipment.Api.Application.Equipment.Queries;
 using Equipment.Api.Application.Equipment.Commands;
-using EquipmentModel = Equipment.Api.Domain.Entities.Equipment;
 
 namespace Equipment.Api.Controllers;
 
@@ -14,13 +12,9 @@ namespace Equipment.Api.Controllers;
 [Route("api/[controller]")]
 public class EquipmentsController : ControllerBase
 {
-    private readonly IEquipmentService _equipmentService;
     private readonly ISender _sender;
-    public EquipmentsController(
-    IEquipmentService equipmentService,
-    ISender sender)
+    public EquipmentsController(ISender sender)
     {
-        _equipmentService = equipmentService;
         _sender = sender;
     }
 
@@ -28,7 +22,7 @@ public class EquipmentsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var data = await _equipmentService.GetAllAsync();
+        var data = await _sender.Send(new GetAllEquipmentsQuery());
         return Ok(data);
     }
 
@@ -56,7 +50,8 @@ public class EquipmentsController : ControllerBase
         new CreateEquipmentCommand(
             request.Code,
             request.Name,
-            request.Status)
+            request.Status,
+            request.CategoryId)
         );
         return CreatedAtAction(nameof(GetById), new { id = data.Id }, data);
     }
@@ -65,8 +60,15 @@ public class EquipmentsController : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, UpdateEquipmentRequest request)
     {
-        var result = await _equipmentService.UpdateAsync(id, request);
-        if (!result) return NotFound();
+        var data = await _sender.Send(
+            new UpdateEquipmentCommand(
+                id,
+                request.Code,
+                request.Name,
+                request.Status,
+                request.CategoryId));
+
+        if (data == null) return NotFound();
         return NoContent();
     }
 
@@ -74,8 +76,10 @@ public class EquipmentsController : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var result = await _equipmentService.DeleteAsync(id);
+        var result = await _sender.Send(new DeleteEquipmentCommand(id));
+
         if (!result) return NotFound();
+
         return NoContent();
     }
 }

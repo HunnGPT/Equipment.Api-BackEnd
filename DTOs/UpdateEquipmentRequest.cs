@@ -14,4 +14,8 @@ public class UpdateEquipmentRequest
 
     [Required]
     public string Status { get; set; } = "";
+
+    [Required]
+    [Range(1, int.MaxValue)]
+    public int CategoryId { get; set; }
 }
