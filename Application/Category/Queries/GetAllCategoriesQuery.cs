@@ -1,11 +1,10 @@
 using MediatR;
 using Equipment.Api.DTOs;
+using Equipment.Api.DTOs.Paging;
 
 namespace Equipment.Api.Application.Category.Queries;
 
-public class GetAllCategoriesQuery : IRequest<CategoryListResponse>
+public class GetAllCategoriesQuery : PagedRequest, IRequest<PagedResult<CategoryDto>>
 {
     public string? Search { get; set; }
-    public int PageNumber { get; set; } = 1;
-    public int PageSize { get; set; } = 10;
 }

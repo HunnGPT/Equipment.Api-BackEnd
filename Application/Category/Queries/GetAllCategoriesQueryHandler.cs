@@ -1,13 +1,14 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Equipment.Api.DTOs;
+using Equipment.Api.DTOs.Paging;
+using Microsoft.EntityFrameworkCore;
 using Equipment.Api.Infrastructure.Data;
 using Equipment.Api.Application.Category.Queries;
 
 namespace Equipment.Api.Application.Category.Handlers;
 
 public class GetAllCategoriesQueryHandler
-    : IRequestHandler<GetAllCategoriesQuery, CategoryListResponse>
+    : IRequestHandler<GetAllCategoriesQuery, PagedResult<CategoryDto>>
 {
     private readonly AppDbContext _dbContext;
 
@@ -16,7 +17,7 @@ public class GetAllCategoriesQueryHandler
         _dbContext = dbContext;
     }
 
-    public async Task<CategoryListResponse> Handle(
+    public async Task<PagedResult<CategoryDto>> Handle(
         GetAllCategoriesQuery request,
         CancellationToken cancellationToken)
     {
@@ -49,13 +50,12 @@ public class GetAllCategoriesQueryHandler
             })
             .ToListAsync(cancellationToken);
 
-        return new CategoryListResponse
+        return new PagedResult<CategoryDto>
         {
             Items = items,
             PageNumber = pageNumber,
             PageSize = pageSize,
-            TotalCount = totalCount,
-            TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
+            TotalCount = totalCount
         };
     }
 }

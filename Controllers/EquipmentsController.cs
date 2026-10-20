@@ -20,10 +20,12 @@ public class EquipmentsController : ControllerBase
 
     [Authorize]
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll(
+    [FromQuery] GetAllEquipmentsQuery query,
+    CancellationToken cancellationToken)
     {
-        var data = await _sender.Send(new GetAllEquipmentsQuery());
-        return Ok(data);
+        var result = await _sender.Send(query, cancellationToken);
+        return Ok(result);
     }
 
     [Authorize]
