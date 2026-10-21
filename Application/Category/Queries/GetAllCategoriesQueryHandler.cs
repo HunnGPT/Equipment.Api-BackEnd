@@ -32,30 +32,18 @@ public class GetAllCategoriesQueryHandler
             query = query.Where(c => c.Name.ToLower().Contains(search.ToLower()));
         }
 
-        var totalCount = await query.CountAsync(cancellationToken);
-
-        var pageNumber = Math.Max(1, request.PageNumber);
-        var pageSize = Math.Clamp(request.PageSize, 1, 100);
-
-        var items = await query
+        var categoryQuery = query
             .OrderBy(c => c.Name)
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
             .Select(c => new CategoryDto
             {
                 Id = c.Id,
                 Name = c.Name,
                 Description = c.Description,
                 EquipmentCount = c.Equipments.Count()
-            })
-            .ToListAsync(cancellationToken);
+            });
 
-        return new PagedResult<CategoryDto>
-        {
-            Items = items,
-            PageNumber = pageNumber,
-            PageSize = pageSize,
-            TotalCount = totalCount
-        };
+        return await categoryQuery.ToPagedAsync(
+            request,
+            cancellationToken);
     }
 }
